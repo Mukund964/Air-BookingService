@@ -2,7 +2,7 @@ const bookingRepository = require('../repository/booking_repo');
 const {FLIGHT_SERVICE_PATH} = require('../config/server-config');
 const axios = require('axios');
 const {StatusCodes} = require('http-status-codes');
-const {validationError, ServerError} = require('../utils/index');
+const {validationError, ServerError,AppError} = require('../utils/index');
 class bookingService{
     constructor(){
         this.bookingRepo=new bookingRepository();
@@ -23,7 +23,6 @@ class bookingService{
             const booking = await this.bookingRepo.create(bookingPayLoad);
             const updateFlightUrlRequest = `${FLIGHT_SERVICE_PATH}/api/v1/flight/${booking.flightId}`;
             await axios.patch(updateFlightUrlRequest,{TotalSeats : remainingSeats});
-            console.log(booking);
             const finalbooking = await this.bookingRepo.update(booking.id,{status:"Confirmed"});
             return finalbooking;
         } catch (error) {
