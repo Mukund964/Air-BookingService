@@ -1,4 +1,4 @@
-const { BOOKING_BINDING_KEY } = require('../config/server-config');
+const { REMINDER_BINDING_KEY } = require('../config/server-config');
 const bookingService = require('../services/booking-Service');
 const {createChannel,publishMessage} = require('../utils/MessageQueues');
 
@@ -8,7 +8,7 @@ const sendMessageToQueue = async(req,res) =>{
     try {
         const channel = await createChannel();
         const data = {Message : 'Sending Msg'};
-        publishMessage(channel,BOOKING_BINDING_KEY,JSON.stringify(data));
+        publishMessage(channel,REMINDER_BINDING_KEY,JSON.stringify(data));
         return res.status(201).json({message:'Successfully sent to Queue!'});
         
     } catch (error) {

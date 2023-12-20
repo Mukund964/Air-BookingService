@@ -7,7 +7,6 @@ const createChannel = async() => {
         const channel = await connection.createChannel()
         await channel.assertExchange(EXCHANGE_NAME,'direct',false);
         return channel;
-        
     } catch (error) {
         throw error;
     }
@@ -15,8 +14,8 @@ const createChannel = async() => {
 
 const subscribeMessage = async(channel,service,binding_Key) =>{
     try {
-        const applicationQueue = await channel.assertQueue('QUEUE_NAME');
-        channel.bindQueue(applicationQueue,EXCHANGE_NAME,binding_Key);
+        const applicationQueue = await channel.assertQueue('REMINDER_QUEUE');
+        channel.bindQueue(applicationQueue.queue,EXCHANGE_NAME,binding_Key);
         channel.consume(applicationQueue.queue,msg => {
             console.log('Received data');
             console.log(msg.content.toString());
@@ -29,7 +28,8 @@ const subscribeMessage = async(channel,service,binding_Key) =>{
 
 const publishMessage = async(channel, binding_Key,message) => {
     try {
-        await channel.assertQueue('QUEUE_NAME')
+        const applicationQueue = await channel.assertQueue('REMINDER_QUEUE');
+        channel.bindQueue(applicationQueue.queue,EXCHANGE_NAME,binding_Key);
         await channel.publish(EXCHANGE_NAME,binding_Key,Buffer.from(message));
     } catch (error) {
         throw error;
