@@ -10,7 +10,7 @@ const app = express();
 const startServer = () =>{
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended:true}));
-    app.use('/api',apiRoutes);
+    app.use('/bookingService/api',apiRoutes);
     if(SYNC_DB){
         db.sequelize.sync({alter:true});
     }
