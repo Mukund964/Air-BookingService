@@ -5,6 +5,7 @@ const {Booking} = require('../models/index');
 class bookingRepository{
     async create(data){
         try {
+            console.log("Repo called");
             const book = await Booking.create(data);
             return book;
         } catch (error) {

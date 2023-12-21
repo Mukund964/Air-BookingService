@@ -1,13 +1,29 @@
 const bookingRepository = require('../repository/booking_repo');
-const {FLIGHT_SERVICE_PATH} = require('../config/server-config');
+const {FLIGHT_SERVICE_PATH,REMINDER_BINDING_KEY} = require('../config/server-config');
 const axios = require('axios');
 const {StatusCodes} = require('http-status-codes');
 const {validationError, ServerError,AppError} = require('../utils/index');
+const {createChannel,publishMessage} = require('../utils/MessageQueues');
 class bookingService{
     constructor(){
         this.bookingRepo=new bookingRepository();
     }
-    
+    async sendMessageToQueue(){
+        try {
+            const channel = await createChannel();
+            let id = 2;
+            const data = {
+                subject : `This is subject ${id}`,
+                content : `This is content ${id}`,
+                recipietEmail : 'sd88028@gmail.com',
+                notificationTime : new Date()
+            }
+            publishMessage(channel,REMINDER_BINDING_KEY,JSON.stringify(data));
+            id++;
+        } catch (error) {
+            throw error;
+        }
+    }
     async create(data){
         try {
             let flightId = data.flightId;
@@ -24,6 +40,7 @@ class bookingService{
             const updateFlightUrlRequest = `${FLIGHT_SERVICE_PATH}/api/v1/flight/${booking.flightId}`;
             await axios.patch(updateFlightUrlRequest,{TotalSeats : remainingSeats});
             const finalbooking = await this.bookingRepo.update(booking.id,{status:"Confirmed"});
+            this.sendMessageToQueue();
             return finalbooking;
         } catch (error) {
             if(error.name == 'SequelizeValidationError') throw new validationError();
